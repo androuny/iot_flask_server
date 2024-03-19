@@ -58,6 +58,7 @@
 
       socket.on("conn_response", (response) => {
         console.log("socketio connection success");
+        startTime = response["last_packet_timestamp"];
       });
 
       socket.on("packet_event", (response) => {
@@ -176,6 +177,11 @@
 
       let debug_button = document.getElementById("debug_checkbox");
       debug_button.addEventListener("click", handleDebugToggle);
+
+      // u gotta do this otherwise some funky shit can happen :p
+      debug_button.click();
+      debug_button.click();
+
       startStopwatch();
       serverHeartbeat();
     </script>
