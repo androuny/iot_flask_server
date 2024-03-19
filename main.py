@@ -6,7 +6,7 @@ import time
 app = Flask(__name__)
 Minify(app=app, html=True, js=True, cssless=True)
 app.config['SECRET_KEY'] = '2e9ue8u39hugt4hu9grn9uf2n9u31eniu31duinfenuigr2475'
-socketio = SocketIO(app)
+socketio = SocketIO(app, async_mode="eventlet")
 
 last_packet_timestamp = 0
 
@@ -47,5 +47,5 @@ def test_disconnect():
 def ping_pong():
     emit('pong')
 
-if __name__ == '__main__':
+if __name__ == '__main__': # uhm this is here for debug purposes
     socketio.run(app, host="0.0.0.0", debug=False)
