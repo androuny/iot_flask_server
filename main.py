@@ -1,12 +1,10 @@
 from flask import Flask, render_template, request, send_from_directory
 from flask_socketio import SocketIO, emit
-from flask_minify import Minify
 import time
 
 app = Flask(__name__)
-Minify(app=app, html=True, js=True, cssless=True)
 app.config['SECRET_KEY'] = '2e9ue8u39hugt4hu9grn9uf2n9u31eniu31duinfenuigr2475'
-socketio = SocketIO(app, async_mode="eventlet")
+socketio = SocketIO(app, async_mode="gevent",cors_allowed_origins='*')
 
 last_packet_timestamp = 0
 
