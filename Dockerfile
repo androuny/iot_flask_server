@@ -1,17 +1,17 @@
-FROM debian:bullseye-20240311-slim
+FROM python:alpine
 
 WORKDIR /usr/src
-
-RUN apt-get update 
-RUN apt-get install -y python3 python3-pip
 
 COPY . .
 
 EXPOSE 5000
 
+RUN python -m venv env
+RUN source env/bin/activate
+
 RUN pip install --no-cache-dir --upgrade -r requirements.txt
 
-RUN useradd --create-home appuser
+RUN adduser appuser --disabled-password
 USER appuser
 
-CMD ["gunicorn", "--worker-class", "eventlet", "-w", "4", "--bind", "0.0.0.0:5000", "wsgi:app"]
+CMD ["gunicorn", "wsgi:app"]
