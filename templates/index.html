@@ -36,12 +36,9 @@
         <input type="checkbox" name="debug_checkbox" id="debug_checkbox" value="unchecked"> 
         <label for="debug_checkbox">show debug info 💻</label>
 
-        <p id="heartbeat">awaiting heartbeat response...</p>
-
         <fieldset class="box">
           <legend>sensors</legend>
 
-          <p id="display" class="debug hidden">waiting for packet...</p>
           <p id="temp">waiting for packet...</p>
           <p id="hum">waiting for packet...</p>
           <p id="time_diff" class="debug hidden">waiting for packet...</p>
@@ -51,10 +48,12 @@
         <fieldset class="box">
           <legend>packet trace</legend>
 
-          <p>client (this device)</p>
-          <p>server</p>
-          <p>gateway station</p>
-          <p>sensor station</p>
+          <p id="packet_client">🟥client (this device)...</p>
+          <p id="packet_server">🟥server...</p>
+          <p id="packet_gateway">🟥gateway station...</p>
+          <p id="packet_weather">🟥weather station...</p>
+
+          <a href="/static/system_architecture.jpg">system architecture explained here</a>
         </fieldset>
     </div>
 

@@ -6,6 +6,7 @@ let startTime;
 let lastHeartbeat = new Date().getTime();
 let timeArray = [];
 let RSSIarray = [];
+let gateway_timestamp = 0;
 // god excuse me on this godawful unorganized js
 
 socket.on("conn_response", (response) => {
@@ -18,10 +19,10 @@ socket.on("packet_event", (response) => {
   let hum = response["humidity"];
   let temp = response["temperature"];
   let rssi = response["rssi"];
+  gateway_timestamp = response["gateway_timestamp"];
   updateReadings(Number(hum.toFixed(2)), Number(temp.toFixed(2)));
   handlePingAverage();
   handleRssiAverage(rssi);
-  resetStopwatch();
 });
 
 socket.on("pong", (response) => {
@@ -62,42 +63,6 @@ function handleRssiAverage(rssi) {
   document.getElementById('rssi').textContent = `Last packet RSSI was ${rssi} dBm. Average packet RSSI is ${average} dBm (based on last 20 received packets)`;
 }
 
-function startStopwatch() {
-    startTime = new Date().getTime();
-    updateDisplay();
-    setInterval(updateDisplay, 50);
-    updateHeartbeatDisplay();
-    setInterval(updateHeartbeatDisplay, 50);
-}
-
-function resetStopwatch() {
-  startTime = 0;
-  updateDisplay();
-  startStopwatch();
-}
-
-function updateDisplay() {
-    const currentTime = new Date().getTime();
-    const elapsed = new Date(currentTime - startTime);
-    const hours = elapsed.getUTCHours().toString().padStart(2, '0');
-    const minutes = elapsed.getUTCMinutes().toString().padStart(2, '0');
-    const seconds = elapsed.getUTCSeconds().toString().padStart(2, '0');
-    const miliseconds = elapsed.getUTCMilliseconds().toString().padStart(3, '0');
-    document.getElementById('display').textContent = `Last packet received ${hours}h ${minutes}m ${seconds}s ${miliseconds}ms ago`;
-    //console.log(`${hours}:${minutes}:${seconds}:${miliseconds}`);
-}
-
-function updateHeartbeatDisplay() {
-    const currentTime = new Date().getTime();
-    const elapsed = new Date(currentTime - lastHeartbeat);
-    const hours = elapsed.getUTCHours().toString().padStart(2, '0');
-    const minutes = elapsed.getUTCMinutes().toString().padStart(2, '0');
-    const seconds = elapsed.getUTCSeconds().toString().padStart(2, '0');
-    const miliseconds = elapsed.getUTCMilliseconds().toString().padStart(3, '0');
-    document.getElementById('heartbeat').textContent = `Last server heartbeat received ${hours}h ${minutes}m ${seconds}s ${miliseconds}ms ago. RTT ${pingpong_rtt}ms`;
-    //console.log(`${hours}:${minutes}:${seconds}:${miliseconds}`);
-}
-
 function updateReadings(hum, temp) {
   document.getElementById("hum").textContent = `🌊 Humidity: ${hum}%`;
   document.getElementById("temp").textContent = `🔥 Temperature: ${temp}°C`;
@@ -127,6 +92,40 @@ function handleDebugToggle() {
   }
 }
 
+function handlePacketTrace() {
+    const red = "🟥";
+    const green = "🟩";
+
+    let packet_client = document.getElementById("packet_client");
+    let packet_server = document.getElementById("packet_server");
+    let packet_gateway = document.getElementById("packet_gateway");
+    let packet_station = document.getElementById("packet_weather");
+
+    packet_client.textContent = `${green}client (this device)`;
+
+    setInterval(() => { // handle packet_server
+        const max_heartbeat_age = 4000; // max allowed heartbeat age in milliseconds
+        let heartbeat_age = new Date().getTime() - lastHeartbeat; // heartbeat age in ms
+        let heartbeat_age_seconds = ( heartbeat_age / 1000 ).toFixed(1);
+        if (heartbeat_age > max_heartbeat_age) { // if last heartbeat older than max allowed
+            packet_server.textContent = `${red}server - last heartbeat ${heartbeat_age_seconds}s ago. RTT ${pingpong_rtt}ms`;
+        } else {
+            packet_server.textContent = `${green}server - last heartbeat ${heartbeat_age_seconds}s ago. RTT ${pingpong_rtt}ms`;
+        }
+    }, 100);
+
+    setInterval(() => { // handle packet_gateway
+        const max_gateway_timestamp_age = 6000; // max allowed timestamp age in milliseconds
+        let timestamp_age = new Date().getTime() - gateway_timestamp; // gateway timestamp age in ms
+        let timestamp_age_seconds = ( timestamp_age / 1000).toFixed(1);
+        if (timestamp_age > max_gateway_timestamp_age) {
+            packet_gateway.textContent = `${red}gateway station - last packet ${timestamp_age_seconds}s ago.`;
+        } else {
+            packet_gateway.textContent = `${green}gateway station - last packet ${timestamp_age_seconds}s ago.`;
+        }
+    }, 100);
+}
+
 let debug_button = document.getElementById("debug_checkbox");
 debug_button.addEventListener("click", handleDebugToggle);
 
@@ -134,5 +133,6 @@ debug_button.addEventListener("click", handleDebugToggle);
 debug_button.click();
 debug_button.click();
 
-startStopwatch();
+// call all the starting functions
 serverHeartbeat();
+handlePacketTrace();

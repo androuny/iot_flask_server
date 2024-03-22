@@ -27,10 +27,16 @@ def api_submit():
         temp = request.json["temperature"]
         hum = request.json["humidity"]
         rssi = request.json["rssi"]
-        socketio.emit("packet_event", {"temperature":temp,"humidity":hum,"rssi":rssi})
+        gateway_timestamp = request.json["unixtime"]
+        socketio.emit("packet_event", {"temperature":temp,"humidity":hum,"rssi":rssi,"gateway_timestamp":gateway_timestamp})
         return "good"
     else:
         return 400
+
+@app.route("/timestamp")
+def api_timestamp():
+    t = round( time.time() * 1000 ) # returnds solid rounded ms since epoch
+    return {"timestamp":t}
 
 @socketio.on('connect')
 def test_connect(auth):
