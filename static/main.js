@@ -18,7 +18,13 @@ socket.on("packet_event", (response) => {
   console.log("[packet_event] event recieved!");
   let hum = response["humidity"];
   let temp = response["temperature"];
-  let rssi = response["rssi"];
+  let rssi = response["wifi_rssi"];
+
+  let radio_rssi = response["radio_rssi"];
+  let radio_lq = response["radio_lq"];
+
+  console.log(`[433mhz] rssi ${radio_rssi}, lq ${radio_lq}`);
+
   gateway_timestamp = response["gateway_timestamp"];
   updateReadings(Number(hum.toFixed(2)), Number(temp.toFixed(2)));
   handlePingAverage();

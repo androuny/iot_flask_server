@@ -26,9 +26,11 @@ def api_submit():
         print(request.data)
         temp = request.json["temperature"]
         hum = request.json["humidity"]
-        rssi = request.json["rssi"]
+        wifi_rssi = request.json["wifi_rssi"]
+        radio_rssi = request.json["radio_rssi"]
+        radio_lq = request.json["radio_lq"]
         gateway_timestamp = request.json["unixtime"]
-        socketio.emit("packet_event", {"temperature":temp,"humidity":hum,"rssi":rssi,"gateway_timestamp":gateway_timestamp})
+        socketio.emit("packet_event", {"temperature":temp,"humidity":hum,"wifi_rssi":wifi_rssi,"gateway_timestamp":gateway_timestamp,"radio_rssi":radio_rssi,"radio_lq":radio_lq})
         return "good"
     else:
         return 400

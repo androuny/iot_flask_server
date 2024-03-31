@@ -13,4 +13,5 @@ EXPOSE 5000
 RUN adduser appuser --disabled-password
 USER appuser
 
-CMD ["gunicorn","--worker-class","geventwebsocket.gunicorn.workers.GeventWebSocketWorker","-w","1","--bind","0.0.0.0:5000", "wsgi:app"]
+CMD ["gunicorn", "wsgi:app"]
+#CMD ["gunicorn","--worker-class","geventwebsocket.gunicorn.workers.GeventWebSocketWorker","-w","1","--bind","0.0.0.0:5000", "wsgi:app"]
